@@ -6,7 +6,6 @@
 #include "Engine/Engine.h"
 #include "Components/BoxComponent.h"
 #include "Particles/ParticleSystemComponent.h"
-#include "AICharacter.h"
 #include "EnemyCharacter.h"
 #include "../Action100ProjectGameMode.h"
 #include "Kismet/GameplayStatics.h"
@@ -48,6 +47,8 @@ void ALevelSpawnActor::Tick(float DeltaTime)
 void ALevelSpawnActor::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+	DOREPLIFETIME(ALevelSpawnActor, BossSpawnLocation);
+	DOREPLIFETIME(ALevelSpawnActor, SpawnLocations);
 
 }
 
@@ -63,6 +64,16 @@ void ALevelSpawnActor::SpawnCharacters_Implementation()
 		GameMode->Enemys.Add(spawnBoss);
 		spawnBoss->OnCharSpawn.AddUObject(this, &ALevelSpawnActor::SpawnAddCharacters);
 		OnBossHp.Broadcast();
+
+		BossSpawnLocation->SetActive(true, true);
+		FTimerHandle timerHandle;
+		GetWorldTimerManager().SetTimer(
+			timerHandle,
+			FTimerDelegate::CreateLambda([this]() {
+				BossSpawnLocation->SetActive(false, false);
+				}), 1.0f, false);
+
+
 	}
 
 	for (UParticleSystemComponent* SpawnLocation : SpawnLocations)
@@ -74,6 +85,9 @@ void ALevelSpawnActor::SpawnCharacters_Implementation()
 		spawnedChars.Add(spawnedChar);
 		spawnedChar->OnCharSpawn.AddUObject(this, &ALevelSpawnActor::SpawnAddCharacters);
 		GameMode->Enemys.Add(spawnedChar);
+		ActiveEffect(SpawnCounted);
+
+
 		SpawnCounted++;
 	}
 	bisSpawned = true;
@@ -97,6 +111,7 @@ void ALevelSpawnActor::SpawnAddCharacters_Implementation(int addIndex)
 			spawnedChar->OnCharSpawn.AddUObject(this, &ALevelSpawnActor::SpawnAddCharacters);
 			GameMode->Enemys.Add(spawnedChar);
 		}
+		ActiveEffect(SpawnCounted % SpawnLocations.Num());
 	}
 	else
 	{
@@ -142,6 +157,19 @@ void ALevelSpawnActor::OnTrigger(UPrimitiveComponent* OverlappedComponent, AActo
 	OnLevelStart.Broadcast();
 	OverlapTrigger->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 
+}
+
+void ALevelSpawnActor::ActiveEffect_Implementation(int32 index)
+{
+	SpawnLocations[index]->SetActive(true, true);
+	FTimerHandle timerHandle;
+	FTimerDelegate RespawnDelegate = FTimerDelegate::CreateUObject(this, &ALevelSpawnActor::DeActiveEffect, index);
+	GetWorldTimerManager().SetTimer(timerHandle, RespawnDelegate, 1.0f, false);
+}
+
+void ALevelSpawnActor::DeActiveEffect_Implementation(int32 index)
+{
+	SpawnLocations[index]->SetActive(false, false);
 }
 
 void ALevelSpawnActor::WallActive_Implementation(bool bActive, ECollisionEnabled::Type type)

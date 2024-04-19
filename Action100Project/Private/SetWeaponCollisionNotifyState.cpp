@@ -21,7 +21,9 @@ void USetWeaponCollisionNotifyState::NotifyEnd(USkeletalMeshComponent* MeshComp,
 {
 	IEpuipFunctionInterface* Interface = Cast<IEpuipFunctionInterface>(MeshComp->GetOwner());
 	if (Interface != nullptr) {
+		FDamageInfo DamageInfo;
 		Interface->SetWeaponCollision(Channel, ECR_Ignore);
+		//Interface->SetCurrentDamageInfo(DamageInfo);
 	}
 
 }

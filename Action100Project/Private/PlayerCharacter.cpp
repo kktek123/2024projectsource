@@ -230,6 +230,7 @@ void APlayerCharacter::MontageComplete(UAnimMontage* montage, bool bInterrupted)
 	CheckTargetAbillity(0);
 	bIsAttacking = false;
 	bIsEvade = false;
+	bIsArmored = false;
 }
 
 void APlayerCharacter::Attack()
@@ -243,7 +244,7 @@ void APlayerCharacter::Attack()
 		{
 			SetActorRotation(UKismetMathLibrary::FindLookAtRotation(GetActorLocation(), TargetActor->GetActorLocation()));
 		}
-		PlayAnimMontage(AttackComboMontage, 1, AnimNextSectionName);
+		//PlayAnimMontage(AttackComboMontage, 1, AnimNextSectionName);
 		HandleAnimtion(AttackComboMontage, AnimNextSectionName);
 		bIsAttacking = true;
 	}
@@ -261,7 +262,7 @@ void APlayerCharacter::Evade()
 	{
 		EvadeCoolTime = 0;
 		CheckAnimPlay(EvadeMontage);
-		PlayAnimMontage(EvadeMontage, 1, AnimNextSectionName);
+		//PlayAnimMontage(EvadeMontage, 1, AnimNextSectionName);
 		HandleAnimtion(EvadeMontage, AnimNextSectionName);
 		bIsEvade = true;
 	}
@@ -283,9 +284,10 @@ void APlayerCharacter::Skill1()
 			SetActorRotation(UKismetMathLibrary::FindLookAtRotation(GetActorLocation(), TargetActor->GetActorLocation()));
 			bLockTarget = true;
 		}
-		PlayAnimMontage(Skill1Montage, 1, AnimNextSectionName);
+		//PlayAnimMontage(Skill1Montage, 1, AnimNextSectionName);
 		HandleAnimtion(Skill1Montage, AnimNextSectionName);
 		bIsAttacking = true;
+		bIsArmored = true;
 	}
 }
 
@@ -305,9 +307,10 @@ void APlayerCharacter::Skill2()
 			SetActorRotation(UKismetMathLibrary::FindLookAtRotation(GetActorLocation(), TargetActor->GetActorLocation()));
 			bLockTarget = true;
 		}
-		PlayAnimMontage(Skill2Montage, 1, AnimNextSectionName);
+		//PlayAnimMontage(Skill2Montage, 1, AnimNextSectionName);
 		HandleAnimtion(Skill2Montage, AnimNextSectionName);
 		bIsAttacking = true;
+		bIsArmored = true;
 	}
 }
 
@@ -327,9 +330,9 @@ void APlayerCharacter::Abillity1()
 			SetActorRotation(UKismetMathLibrary::FindLookAtRotation(GetActorLocation(), TargetActor->GetActorLocation()));
 			bLockTarget = true;
 		}
-		PlayAnimMontage(Abillity1Montage, 1, AnimNextSectionName);
+		//PlayAnimMontage(Abillity1Montage, 1, AnimNextSectionName);
 		HandleAnimtion(Abillity1Montage, AnimNextSectionName);
-
+		bIsArmored = true;
 		OnRep_SetIsCanAbillity(false);
 	}
 }
@@ -350,8 +353,8 @@ void APlayerCharacter::Abillity2()
 			SetActorRotation(UKismetMathLibrary::FindLookAtRotation(GetActorLocation(), TargetActor->GetActorLocation()));
 			bLockTarget = true;
 		}
-
-		PlayAnimMontage(Abillity2Montage, 1, AnimNextSectionName);
+		bIsArmored = true;
+		//PlayAnimMontage(Abillity2Montage, 1, AnimNextSectionName);
 		HandleAnimtion(Abillity2Montage, AnimNextSectionName);
 
 		OnRep_SetIsCanAbillity(false);
@@ -374,8 +377,8 @@ void APlayerCharacter::Abillity3()
 			SetActorRotation(UKismetMathLibrary::FindLookAtRotation(GetActorLocation(), TargetActor->GetActorLocation()));
 			bLockTarget = true;
 		}
-
-		PlayAnimMontage(Abillity3Montage, 1, AnimNextSectionName);
+		bIsArmored = true;
+		//PlayAnimMontage(Abillity3Montage, 1, AnimNextSectionName);
 		HandleAnimtion(Abillity3Montage, AnimNextSectionName);
 
 		OnRep_SetIsCanAbillity(false);
@@ -406,7 +409,7 @@ void APlayerCharacter::Hit()
 		SetActorRotation(UKismetMathLibrary::FindLookAtRotation(GetActorLocation(), TargetActor->GetActorLocation()));
 		bLockTarget = true;
 	}
-	PlayAnimMontage(HitReactionMontage, 1.5, AnimNextSectionName);
+	if(!bIsArmored)
 	HandleAnimtion(HitReactionMontage, AnimNextSectionName);
 }
 
@@ -561,8 +564,7 @@ void APlayerCharacter::HandleAnimtion_Implementation(UAnimMontage* Montage, FNam
 
 void APlayerCharacter::HandleAnimtionMulticast_Implementation(UAnimMontage* Montage, FName SectionName)
 {
-	if(!IsLocallyControlled())
-		PlayAnimMontage(Montage, 1, SectionName);
+	PlayAnimMontage(Montage, 1, SectionName);
 }
 
 
@@ -758,7 +760,7 @@ void APlayerCharacter::Sidekick1ActivateSupportfalse_Implementation()
 	}
 }
 
-void APlayerCharacter::SetCurrentDamageInfo(FDamageInfo DamageInfo)
+void APlayerCharacter::SetCurrentDamageInfo_Implementation(FDamageInfo DamageInfo)
 {
 	CurrentDamageInfo = DamageInfo;
 }

@@ -125,7 +125,7 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Health")
 		virtual float TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, AActor* DamageCauser) override;
 
-protected:
+public:
 	/*서버내에서 애니메이션 수행*/
 	UFUNCTION(Server, Reliable)
 		void HandleAnimtion(UAnimMontage* Montage, FName SectionName);
@@ -224,6 +224,8 @@ public:
 		bool bIsAttacking;
 	UPROPERTY(EditAnyWhere, BlueprintReadwrite)
 		bool bIsEvade;
+	UPROPERTY(EditAnyWhere, BlueprintReadwrite)
+		bool bIsArmored;
 
 	UPROPERTY(EditAnyWhere, BlueprintReadwrite)
 		bool bIsMobileMode;
@@ -290,12 +292,12 @@ protected:
 		UParticleSystem* hitParticleSystem;
 	UPROPERTY(EditAnywhere, BlueprintReadwrite)
 		USoundBase* HitSound;
-	UPROPERTY(Replicated, EditAnywhere, BlueprintReadwrite)
+	UPROPERTY(Replicated,EditAnywhere, BlueprintReadwrite)
 		FDamageInfo CurrentDamageInfo;
 public:
 	UFUNCTION(Server, Reliable,BlueprintCallable, Category = "Weapon")
 		virtual void CollisionTakeDamage(AActor* otherActor ,FDamageInfo DamageInfo) override;
-	UFUNCTION()
+	UFUNCTION(Server, Reliable, BlueprintCallable, Category = "Weapon")
 		virtual void SetCurrentDamageInfo(FDamageInfo DamageInfo) override;
 	UFUNCTION(Client, Reliable, Category = "Damage")
 		void OnWeaponOverlapClient(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);

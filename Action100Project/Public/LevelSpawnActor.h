@@ -28,10 +28,10 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 		class UBoxComponent* TriggerWall;
 
-	UPROPERTY(EditAnywhere, BlueprintReadwrite, Category = "SpawnChar")
+	UPROPERTY(Replicated, EditAnywhere, BlueprintReadwrite, Category = "SpawnChar")
 		TArray<class UParticleSystemComponent*> SpawnLocations;
 
-	UPROPERTY(EditAnywhere, BlueprintReadwrite, Category = "SpawnChar")
+	UPROPERTY(Replicated, EditAnywhere, BlueprintReadwrite, Category = "SpawnChar")
 		class UParticleSystemComponent* BossSpawnLocation;
 
 	UPROPERTY(EditAnywhere, BlueprintReadwrite, Category = "SpawnChar")
@@ -40,9 +40,9 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadwrite, Category = "SpawnChar")
 		TSubclassOf<class AAICharacter> spawnBossClass;
 
-	UPROPERTY(Replicated, EditAnywhere, BlueprintReadwrite, Category = "SpawnChar")
+	UPROPERTY(EditAnywhere, BlueprintReadwrite, Category = "SpawnChar")
 		class AEnemyCharacter* spawnBoss;
-	UPROPERTY(Replicated, EditAnywhere, BlueprintReadwrite, Category = "SpawnChar")
+	UPROPERTY(EditAnywhere, BlueprintReadwrite, Category = "SpawnChar")
 		TArray <class AAICharacter*> spawnedChars;
 	UPROPERTY(EditAnywhere, BlueprintReadwrite, Category = "SpawnChar")
 		int32 SpawnCount;
@@ -79,4 +79,8 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadwrite, Category = "SpawnChar")
 		bool bBossSpawn;
 
+	UFUNCTION(NetMulticast, Reliable,Category = "Effect")
+		void ActiveEffect(int32 index);
+	UFUNCTION(NetMulticast, Reliable, Category = "Effect")
+		void DeActiveEffect(int32 index);
 };
